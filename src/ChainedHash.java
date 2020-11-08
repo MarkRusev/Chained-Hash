@@ -7,10 +7,8 @@ public class ChainedHash<K,V>{
 	private class HashElement<K,V> implements Comparable<HashElement<K,V>>{
 		
 		K key;
-		@SuppressWarnings("unused")
 		V value;
 		
-		@SuppressWarnings("unused")
 		public HashElement(K key, V value) {
 			// TODO Auto-generated constructor stub
 			this.key = key;
@@ -111,25 +109,30 @@ public class ChainedHash<K,V>{
 		return null;			
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked", "rawtypes", "null" })
 	public void rehash(int newSize) {
+		K[] keys = null;
+		int counter = 0;
 		LinkedList<HashElement<K,V>> [] newArray = (LinkedList <HashElement<K,V>> []) new LinkedList[newSize];
 	
 		for(int i = 0 ; i < newSize ; i++) {
 			newArray[i] = new LinkedList<HashElement<K,V>>();
 		}
-
-	/*	for(K key : this) {
-			V value = getValue(key);
-			HashElement<K,V> hashE = new HashElement(key,value);
-			int hashValue = (key.hashCode() & 0x7FFFFFFF) % this.tableSize;
-			newArray[hashValue].add(hashE);
-		}*/
-		
+        
+		for (int i = 0; i < tableSize; i++) {
+			LinkedList<HashElement<K,V>> list = hashArray[i];
+			
+			for(HashElement<K,V> hashE: list) {
+				keys[counter++] = (K) hashE.key;
+				V value = getValue(keys[counter]);
+				HashElement<K,V> hashElement = new HashElement(keys[counter],value);
+				int hashValue = (keys[counter].hashCode() & 0x7FFFFFFF) % this.tableSize;
+				newArray[hashValue].add(hashElement);
+			}
+		}		
+	
 		this.hashArray = newArray;
-		this.tableSize = newSize;
-		
-		
+		this.tableSize = newSize;	
 	}
 	
 	
